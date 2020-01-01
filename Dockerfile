@@ -1,7 +1,17 @@
-FROM trestletech/plumber
-LABEL maintainer="mark"
+# Use the official R image
+# https://hub.docker.com/_/r-base
+FROM r-base
 
-COPY [".", "./"]
+# Create and change to the app directory.
+WORKDIR /usr/src/app
 
-ENTRYPOINT ["R", "-e", "pr <- plumber::plumb(commandArgs()[4]); pr$run(host='0.0.0.0', port=as.numeric(Sys.getenv('PORT')))"]
-CMD ["plumber.R"]
+# Copy local code to the container image.
+COPY . .
+
+# Install any R packages
+RUN Rscript -e "install.packages('plumber')"
+
+EXPOSE 8080
+
+# Run the web service on container startup.
+CMD [ "Rscript", "server.R"]
